@@ -1,11 +1,13 @@
 import sqlite3
 
-conn = sqlite3.connect("gestao_clientes.db")
-conn.execute("PRAGMA foreign_keys = ON")
+conn = sqlite3.connect("gestao_clientes.db") #Cria o banco de dados se não existir.
+conn.execute("PRAGMA foreign_keys = ON") #Habilita o suporte a chaves estrangeiras.
 
-cursor = conn.cursor()
+cursor = conn.cursor() #Cria um cursor para executar comandos SQL.
 
-cursor.executescript("""
+
+#Executando vários comandos sql de uma só vez. Criando as tabelas "clientes" e "cliente_telefones".
+cursor.executescript(""" 
 CREATE TABLE IF NOT EXISTS clientes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nome TEXT NOT NULL,
@@ -27,7 +29,7 @@ CREATE TABLE IF NOT EXISTS cliente_telefones (
 );
 """)
 
-conn.commit()
-conn.close()
+conn.commit() #Salva as alterações no banco de dados.
+conn.close() #Fecha a conexão com o banco de dados.
 
-print("Deu certo Criar o Banco de dados!")
+print("Banco de dados e tabelas criados.")
