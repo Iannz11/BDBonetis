@@ -112,53 +112,32 @@ if __name__ == "__main__":
 
 
 #Função de deletar clientes do banco de dados.
-def conectar():
-    return sqlite3.connect("gestao_clientes.db")
+@app.route("/clientes/deletar/<int:id_cliente>")
+def deletar_cliente(id_cliente):
+    conn = conectar()
+    cursor = conn.cursor()
 
-def deletar_cliente():
-    conexao = conectar()
-    cursor = conexao.cursor()
+    try:
+        # Deletar telefones primeiro (relacionamento)
+        cursor.execute(
+            "DELETE FROM cliente_telefones WHERE cliente_id = ?",
+            (id_cliente,)
+        )
 
-    id_cliente = input("Digite o ID do cliente que deseja deletar: ")
+        # Deletar cliente
+        cursor.execute(
+            "DELETE FROM clientes WHERE id = ?",
+            (id_cliente,)
+        )
 
-    # Verifica se o cliente existe
-    cursor.execute("SELECT nome FROM clientes WHERE id = ?", (id_cliente,))
-    cliente = cursor.fetchone()
+        conn.commit()
 
-    if cliente is None:
-        print(" X Cliente não encontrado.")
-        conexao.close()
-        return
+    except Exception as erro:
+        conn.rollback()
+        return f"Erro ao deletar cliente: {erro}"
 
-    print(f"Cliente encontrado: {cliente[0]}")
+    finally:
+        conn.close()
 
-    confirmacao = input("Você tem certeza que deseja deletar este cliente? (s/n): ")
-
-    if confirmacao.lower() == 's':
-        try:
-            # Deletar telefones
-            cursor.execute(
-                "DELETE FROM cliente_telefones WHERE cliente_id = ?",
-                (id_cliente,)
-            )
-
-            # Deletar cliente
-            cursor.execute(
-                "DELETE FROM clientes WHERE id = ?",
-                (id_cliente,)
-            )
-
-            conexao.commit()
-            print("✅ Cliente deletado com sucesso!")
-
-        except Exception as erro:
-            conexao.rollback()
-            print(" X Erro ao deletar cliente:", erro)
-
-    else:
-        print(" X Operação cancelada.")
-
-    cursor.close()
-    conexao.close()
-
-    
+    # Volta para a listagem
+    return redirect(url_for("clientes"))
