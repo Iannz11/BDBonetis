@@ -6,7 +6,7 @@
 </head>
 <body>
 
-<h1>Lista de Clientes</h1>
+<h2>LISTA DE CLIENTES</h2>
 
 <table border="1" cellpadding="5">
     <tr>
@@ -14,24 +14,26 @@
         <th>Nome</th>
         <th>CPF</th>
         <th>Email</th>
-        <th>Ações</th>
     </tr>
 
-    {% for cliente in clientes %}
-    <tr>
-        <td>{{ cliente[0] }}</td>
-        <td>{{ cliente[1] }}</td>
-        <td>{{ cliente[2] }}</td>
-        <td>{{ cliente[3] }}</td>
-        <td>
-            <a href="#">Visualizar</a> |
-            <a href="#">Editar</a> |
-            <a href="#">Deletar</a>
-        </td>
-    </tr>
-    {% endfor %}
+    {% if not clientes %}
+        <tr>
+            <td colspan="4">Não há clientes cadastrados.</td>
+        </tr>
+    {% else %}
+        {% for cliente in clientes %}
+        <tr>
+            <td>{{ cliente[0] }}</td>
+            <td>{{ cliente[1] }}</td>
+            <td>{{ cliente[2] }}</td>
+            <td>{{ cliente[3] }}</td>
+        </tr>
+        {% endfor %}
+    {% endif %}
 </table>
 
+<br>
+<a href="/">Voltar</a>
 
 </body>
 </html>

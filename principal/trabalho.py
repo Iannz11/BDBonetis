@@ -65,23 +65,78 @@ def adicionar_cliente():
 
     return render_template("adicionar_cliente.html")
 
+# conectando ao banco de dados SQLite ALAN
+def conectar_banco():
+    conn = sqlite3.connect("gestao_clientes.db") 
+    conn.row_factory = sqlite3.Row 
+    return conn
 
+
+# listando os clientes
+def listar_clientes():
+    conn = conectar_banco()
+    cursor = conn.cursor()
+    
+    cursor.execute("""
+                   SELECT id, nome, email, telefone
+                   FROM clientes
+                   ORDER BY id
+                 """)
+    clientes = cursor.fetchall()
+    conn.close()
+
+    print("\n=== LISTA DE CLIENTES ===")
+    print(f"{'ID':<5} {'NOME':<20} {'CPF':<15} {'EMAIL'}")
+
+    if not clientes:
+        print("Não há clientes cadastrados.")
+        return
+
+        for cliente in clientes:
+            print(
+            f"{cliente['id']:<5} "
+            f"{cliente['nome']:<20} "
+            f"{cliente['cpf']:<15} "
+            f"{cliente['email']}"
+        )
+
+    print("\nAções disponíveis por ID:")
+    print("1 - Visualizar | 2 - Editar | 3 - Deletar")
+
+def menu():
+    while True:
+        print("MENU DE CLIENTES: ")
+        print("1 - Listar Clientes")
+        print("0 - Voltar")
+
+        escolha = input("Escolha: ")
+
+        if escolha == "1":
+            listar_clientes()
+        elif escolha == "0":
+            break
+        else:
+            print("Escoçha não existente. Tente novamente.")
+        
+
+if __name__ == "__main__":
+    menu()
 
 #Função de listar clientes do banco de dados.
-def listar_clientes(): #Inicia a função listar_clientes.
-
-    conn = sqlite3.connect("gestao_clientes.db") #Conecta ao banco de dados SQLite chamado "gestao_clientes.db".
-    cursor = conn.cursor() #Cria um cursor para executar comandos SQL.
+@app.route("/clientes")
+def listar_clientes():
+    conn = conectar_banco()
+    cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT id, nome, cpf, email
+        SELECT id, nome, email, telefone
         FROM clientes
+        ORDER BY id
     """)
+    clientes = cursor.fetchall()
+    conn.close()
 
-    clientes = cursor.fetchall() #Busca todos os resultados da consulta SQL e os armazena na variável clientes.
-    conn.close() #Fecha a conexão com o banco de dados.
-
-    return clientes #Por fim, temos a lista de clientes retornada pela função.
+    return render_template("clientes.html", clientes=clientes)
 
 @app.route("/clientes")
 def clientes():
