@@ -196,3 +196,58 @@ def deletar_cliente(id_cliente):
 
     # Volta para a listagem
     return redirect(url_for("clientes"))
+
+#Função de editar clientes do banco de dados.
+
+@app.route("/clientes/editar/<int:id_cliente>", methods=["GET", "POST"])
+def editar_cliente(id_cliente):
+    conn = conectar()
+    cursor = conn.cursor()
+
+    if request.method == "POST":
+        novo_nome = request.form["nome"]
+        nova_idade = request.form["idade"]
+        novo_email = request.form["email"]
+        novo_endereco = request.form["endereco"]
+        nova_localidade = request.form["localidade"]
+        novo_status = request.form["status"]
+
+        try:
+            cursor.execute("""
+                UPDATE clientes
+                SET nome = ?, idade = ?, email = ?, endereco = ?, localidade = ?, status = ?
+                WHERE id = ?
+            """, (
+                novo_nome,
+                nova_idade,
+                novo_email,
+                novo_endereco,
+                nova_localidade,
+                novo_status,
+                id_cliente
+            ))
+
+            conn.commit()
+
+        except Exception as erro:
+            conn.rollback()
+            return f"Erro ao atualizar cliente: {erro}"
+
+        finally:
+            conn.close()
+
+        return redirect(url_for("clientes"))
+
+    # GET → buscar dados atuais
+    cursor.execute("""
+        SELECT nome, idade, email, endereco, localidade, status
+        FROM clientes
+        WHERE id = ?
+    """, (id_cliente,))
+    cliente = cursor.fetchone()
+    conn.close()
+
+    if cliente is None:
+        return "Cliente não encontrado"
+
+    return render_template("editar_cliente.html", cliente=cliente, id_cliente=id_cliente)
