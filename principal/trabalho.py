@@ -1,15 +1,27 @@
 import sqlite3
 from flask import Flask, render_template, request, redirect, url_for
+import os
 
 app = Flask(__name__)
 
 # ======================
 # CONEXÃO COM O BANCO
 # ======================
+import os
+print("ARQUIVO PY:", os.path.abspath(__file__))
+print("PASTA ATUAL:", os.getcwd())
+
+
 def conectar():
-    conn = sqlite3.connect("gestao_clientes.db")
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    DB_PATH = os.path.join(BASE_DIR, "gestao_clientes.db")
+
+    print("📌 BANCO USADO PELO FLASK:", DB_PATH)
+
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
+
 
 
 # ======================
@@ -28,11 +40,7 @@ def listar_clientes():
     conn = conectar()
     cursor = conn.cursor()
 
-    cursor.execute("""
-        SELECT id, nome, cpf, email
-        FROM clientes
-        ORDER BY id
-    """)
+    cursor.execute("SELECT * FROM clientes ORDER BY id DESC")
     clientes = cursor.fetchall()
     conn.close()
 
@@ -126,11 +134,7 @@ def editar_cliente(id_cliente):
 
         return redirect(url_for("listar_clientes"))
 
-    cursor.execute("""
-        SELECT *
-        FROM clientes
-        WHERE id = ?
-    """, (id_cliente,))
+    cursor.execute("SELECT * FROM clientes WHERE id = ?", (id_cliente,))
     cliente = cursor.fetchone()
     conn.close()
 
@@ -170,20 +174,8 @@ def deletar_cliente(id_cliente):
 
 
 # ======================
-# EXECUÇÃO
+# VISUALIZAR CLIENTE
 # ======================
-if __name__ == "__main__":
-    app.run(debug=True)
-
-
-
-
-
-
-# ======================
-# Rota visualizar clientes:
-# ======================
-
 @app.route("/clientes/visualizar/<int:id_cliente>")
 def visualizar_cliente(id_cliente):
     conn = conectar()
@@ -195,10 +187,16 @@ def visualizar_cliente(id_cliente):
         WHERE id = ?
     """, (id_cliente,))
     cliente = cursor.fetchone()
-
     conn.close()
 
     if cliente is None:
         return "Cliente não encontrado"
 
     return render_template("visualizar_cliente.html", cliente=cliente)
+
+
+# ======================
+# EXECUÇÃO
+# ======================
+if __name__ == "__main__":
+    app.run(debug=True)
