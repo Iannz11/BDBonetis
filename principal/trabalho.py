@@ -16,7 +16,7 @@ def conectar():
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     DB_PATH = os.path.join(BASE_DIR, "gestao_clientes.db")
 
-    print("📌 BANCO USADO PELO FLASK:", DB_PATH)
+    print("BANCO USADO PELO FLASK:", DB_PATH)
 
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
@@ -96,7 +96,7 @@ def adicionar_cliente():
 
         return redirect(url_for("listar_clientes"))
 
-    return render_template("adicionar_cliente.html")
+    return render_template("adicionar.html")
 
 
 # ======================
@@ -141,7 +141,7 @@ def editar_cliente(id_cliente):
     if cliente is None:
         return "Cliente não encontrado"
 
-    return render_template("editar_cliente.html", cliente=cliente)
+    return render_template("editar.html", cliente=cliente)
 
 
 # ======================
@@ -192,7 +192,7 @@ def visualizar_cliente(id_cliente):
     if cliente is None:
         return "Cliente não encontrado"
 
-    return render_template("visualizar_cliente.html", cliente=cliente)
+    return render_template("visualizar.html", cliente=cliente)
 
 
 # ======================
@@ -200,3 +200,14 @@ def visualizar_cliente(id_cliente):
 # ======================
 if __name__ == "__main__":
     app.run(debug=True)
+
+
+if __name__ == "__main__":
+    conn = conectar()
+    cursor = conn.cursor()
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+    print(cursor.fetchall())
+    conn.close()
+
+    app.run(debug=True)
+
