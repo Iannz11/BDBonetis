@@ -7,21 +7,13 @@ app = Flask(__name__)
 # ======================
 # CONEXÃO COM O BANCO
 # ======================
-import os
-print("ARQUIVO PY:", os.path.abspath(__file__))
-print("PASTA ATUAL:", os.getcwd())
-
-
 def conectar():
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     DB_PATH = os.path.join(BASE_DIR, "gestao_clientes.db")
 
-    print("BANCO USADO PELO FLASK:", DB_PATH)
-
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
-
 
 
 # ======================
@@ -68,6 +60,7 @@ def adicionar_cliente():
         cursor = conn.cursor()
 
         try:
+            # Insere cliente
             cursor.execute("""
                 INSERT INTO clientes
                 (nome, idade, cpf, email, endereco, localidade, data_nascimento, status)
@@ -76,6 +69,7 @@ def adicionar_cliente():
 
             cliente_id = cursor.lastrowid
 
+            # telefones 
             numeros = request.form.getlist("telefone_numero[]")
             tipos = request.form.getlist("telefone_tipo[]")
 
@@ -109,6 +103,7 @@ def editar_cliente(id_cliente):
 
     if request.method == "POST":
         try:
+            
             cursor.execute("""
                 UPDATE clientes
                 SET nome = ?, idade = ?, email = ?, endereco = ?, localidade = ?, status = ?
@@ -123,6 +118,25 @@ def editar_cliente(id_cliente):
                 id_cliente
             ))
 
+
+#insert telefones
+            ids = request.form.getlist("telefone_id[]")        # ID do telefone
+            numeros = request.form.getlist("telefone_numero[]")
+            tipos = request.form.getlist("telefone_tipo[]")
+
+            for tel_id, numero, tipo in zip(ids, numeros, tipos):
+                if tel_id:  # telefone existente → UPDATE
+                    cursor.execute("""
+                        UPDATE cliente_telefones
+                        SET numero = ?, tipo = ?
+                        WHERE id = ? AND cliente_id = ?
+                    """, (numero, tipo, tel_id, id_cliente))
+                else:       # telefone novo → INSERT
+                    cursor.execute("""
+                        INSERT INTO cliente_telefones (numero, tipo, cliente_id)
+                        VALUES (?, ?, ?)
+                    """, (numero, tipo, id_cliente))
+
             conn.commit()
 
         except Exception as erro:
@@ -134,14 +148,25 @@ def editar_cliente(id_cliente):
 
         return redirect(url_for("listar_clientes"))
 
+    # ----------------------
+    # ALTERADO: buscar cliente
+    # ----------------------
     cursor.execute("SELECT * FROM clientes WHERE id = ?", (id_cliente,))
     cliente = cursor.fetchone()
+
+    cursor.execute("""
+        SELECT id, numero, tipo
+        FROM cliente_telefones
+        WHERE cliente_id = ?
+    """, (id_cliente,))
+    telefones = cursor.fetchall()
+
     conn.close()
 
     if cliente is None:
         return "Cliente não encontrado"
 
-    return render_template("editar.html", cliente=cliente)
+    return render_template("editar.html", cliente=cliente, telefones=telefones)
 
 
 # ======================
@@ -200,14 +225,3 @@ def visualizar_cliente(id_cliente):
 # ======================
 if __name__ == "__main__":
     app.run(debug=True)
-
-
-if __name__ == "__main__":
-    conn = conectar()
-    cursor = conn.cursor()
-    cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
-    print(cursor.fetchall())
-    conn.close()
-
-    app.run(debug=True)
-
