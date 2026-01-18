@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Clientes</title>
+</head>
+<body>
+
+<header>
+    <h1>Lista de Clientes</h1>
+    <nav>
+        <a href="{{ url_for('adicionar_cliente') }}">Novo Cliente</a>
+    </nav>
+    <br>
+</header>
+
+<main>
+    <table border="1" cellpadding="8">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>CPF</th>
+                <th>Email</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if clientes %}
+                {% for cliente in clientes %}
+                <tr>
+                    <td>{{ cliente.id }}</td>
+                    <td>{{ cliente.nome }}</td>
+                    <td>{{ cliente.cpf }}</td>
+                    <td>{{ cliente.email }}</td>
+                    <td>
+                        <a href="{{ url_for('visualizar_cliente', id_cliente=cliente.id) }}">Visualizar</a> |
+                        <a href="{{ url_for('editar_cliente', id_cliente=cliente.id) }}">Editar</a> |
+                        <a href="{{ url_for('deletar_cliente', id_cliente=cliente.id) }}">Deletar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="5">Nenhum cliente cadastrado.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</main>
+
+</body>
+</html>

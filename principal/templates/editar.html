@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Cliente</title>
+</head>
+<body>
+
+<header>
+    <h1>Editar Cliente</h1>
+</header>
+
+<main>
+    <form method="POST">
+        <label>Nome:</label><br>
+        <input type="text" name="nome" value="{{ cliente.nome }}" required><br><br>
+
+        <label>Idade:</label><br>
+        <input type="number" name="idade" value="{{ cliente.idade }}" required><br><br>
+
+        <label>Email:</label><br>
+        <input type="email" name="email" value="{{ cliente.email }}" required><br><br>
+
+        <label>Endereço:</label><br>
+        <input type="text" name="endereco" value="{{ cliente.endereco }}"><br><br>
+
+        <label>Localidade:</label><br>
+        <input type="text" name="localidade" value="{{ cliente.localidade }}"><br><br>
+
+        <label>Status:</label><br>
+        <select name="status">
+            <option value="1" {% if cliente.status == 1 %}selected{% endif %}>Ativo</option>
+            <option value="0" {% if cliente.status == 0 %}selected{% endif %}>Inativo</option>
+        </select><br><br>
+
+        <button type="submit">Atualizar</button>
+        <a href="{{ url_for('listar_clientes') }}">Cancelar</a>
+    </form>
+</main>
+
+</body>
+</html>

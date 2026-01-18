@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Visualizar Cliente</title>
+</head>
+<body>
+
+<header>
+    <h1>Detalhes do Cliente</h1>
+</header>
+
+<main>
+    <p><strong>ID:</strong> {{ cliente.id }}</p>
+    <p><strong>Nome:</strong> {{ cliente.nome }}</p>
+    <p><strong>CPF:</strong> {{ cliente.cpf }}</p>
+    <p><strong>Email:</strong> {{ cliente.email }}</p>
+    <p><strong>Idade:</strong> {{ cliente.idade }}</p>
+    <p><strong>Endereço:</strong> {{ cliente.endereco }}</p>
+    <p><strong>Localidade:</strong> {{ cliente.localidade }}</p>
+    <p><strong>Status:</strong> {{ cliente.status }}</p>
+
+    <br>
+    <a href="{{ url_for('listar_clientes') }}">Voltar</a>
+</main>
+
+</body>
+</html>
